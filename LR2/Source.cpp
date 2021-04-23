@@ -102,11 +102,17 @@ int main() {
         left[i] = search(right[i - 1], psi);
         right[i] = search(right[i - 1], phi);
     }
+
     for (int i = 0; i < f.size(); ++i) {
         int k = f[i].second + search_(k1 - f[i].first, g);
         if (k > P_n[3].second) {
             P_n[3].second = k;
             P_n[3].first = f[i].first;
+        }
+    }
+    for (int i = 1; i < n; i++) {
+        for (int j = left[i]; i <= right[i]; ++j) {
+
         }
     }
 }
