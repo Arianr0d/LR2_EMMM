@@ -1,18 +1,22 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <string>
 
 using namespace std;
 
 
 
 int main() {
-	
-	ifstream file("C:\\Users\\Aria_nrod\\source\\repos\\LR2\\Debug\\Вариант 9.txt");
-	if (file.is_open()) {
-		for (file >> f; !file.eof(); f >> file) {
-			cout << file << endl;
-		}
-	}
+    string line;
+
+    ifstream in("C:\\Users\\kobze\\source\\repos\\LR2_EMMM\\Variant_9.txt");
+    if (in.is_open())
+    {
+        while (getline(in, line))
+        {
+            std::cout << line << std::endl;
+        }
+    }
 
 }
