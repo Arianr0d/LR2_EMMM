@@ -4,6 +4,9 @@
 #include <vector>
 using namespace std;
 
+
+
+
 double search_(double x, vector<pair<int, double>> arr) {
     for (int i = 0; i < arr.size(); ++i) {
         if (x == arr[i].first) {
