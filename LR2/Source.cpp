@@ -4,18 +4,6 @@
 #include <vector>
 using namespace std;
 
-int search(double x, vector<pair<int, double>> arr) {
-    for (int i = 0; i < arr.size(); ++i) {
-        if (x == arr[i].first) {
-            return arr[i].second;
-        }
-        if (x < arr[i].first) {
-            return (arr[i - 1].second * (arr[i].first - x) + arr[i].second * (x - arr[i - 1].first)) / (arr[i].first - arr[i - 1].first);
-        }
-    }
-
-}
-
 double search_(double x, vector<pair<int, double>> arr) {
     for (int i = 0; i < arr.size(); ++i) {
         if (x == arr[i].first) {
@@ -25,7 +13,6 @@ double search_(double x, vector<pair<int, double>> arr) {
             return (arr[i - 1].second * (arr[i].first - x) + arr[i].second * (x - arr[i - 1].first)) / (arr[i].first - arr[i - 1].first);
         }
     }
-
 }
 
 int main() {
@@ -97,8 +84,8 @@ int main() {
     }
 
     for (int i = 1; i < n; ++i) {
-        left[i] = search(right[i - 1], psi);
-        right[i] = search(right[i - 1], phi);
+        left[i] = floor(search_(right[i - 1], psi));
+        right[i] = round(search_(right[i - 1], phi));
     }
 
     /*for (int i = 0; i < f.size(); ++i) {
@@ -182,18 +169,25 @@ int main() {
     
 
     fprintf_s(file, "\n\n");*/
+    vector<vector<pair<int, double>>> P(n);
+    vector<int> shape(n);
+    for (int i = 0; i < n; i++) {
+        P[i].assign(right[i] - left[i] + 1, make_pair(0,0));
+        shape[i] = right[i] - left[i] + 1;
+    }
 
-    vector<vector<pair<int, double>>> P(n, vector<pair<int, double>>(f.size()));
 
-    for (int i = left[n-1]; i <= right[n-1]; ++i) {
+    for (int i = left[n-1], i1 = 0; i <= right[n-1] && i1 < f.size(); ++i, i1++) {
         for (int j = 0; f[j].first <= i; j++) {
-            P[n-1][j].second = f[j].second + search_(i - f[j].first, g);
-            if (P[n - 1][j].second > P_n[3].second) {
-                P_n[3].second = P[n - 1][j].second;
+            P[n-1][i1].second = f[j].second + search_(i - f[j].first, g);
+            if (P[n - 1][i1].second > P_n[3].second) {
+                P_n[3].second = P[n - 1][i1].second;
                 P_n[3].first = f[j].first;
-                P[n - 1][j].first = f[j].first;
+                P[n - 1][i1].first = f[j].first;
             }
         }
+        P[n - 1][i1].second = P_n[3].second;
+        P[n - 1][i1].first = P_n[3].first;
         fprintf_s(file, "%4i | %4i | %5.3f\n", i, P_n[3].first, P_n[3].second);
     }
 
@@ -204,25 +198,32 @@ int main() {
     P_n[0].second = 0;
 
     for (int i = 0; i < P[n-1].size(); i++) {
-        cout << P[n - 1][i].first << " " << P[n - 1][i].second << endl;
+        cout << i + left[n-1] << " " << P[n - 1][i].first << " " << P[n - 1][i].second << endl;
     }
 
-    /*for (int i = n-2; i >= 1; i--) {
+    for (int i = 0; i < n; i++) {
+        cout << left[i] << " " << right[i] << endl;
+    }
+
+    for (int i = n-2; i >= 1; i--) {
 
         fprintf_s(file, "%4s | %4s | %5s \n", "k", "x", "P");
-        for (int j = left[i]; j <= right[i]; ++j) {
+        for (int j = left[i], j1 = 0; j <= right[i] && j1 < f.size(); ++j, j1++) {
             for (int k = 0; f[k].first <= j; k++) {
-                P[i][k].second = f[k].second + search_(j - f[k].first, g) + search_(phi[k].first + search_(j - f[k].first, psi), P[i+1]);
-                if (P[i][k].second > P_n[i].second) {
-                    P_n[i].second = P[i][k].second;
+                P[i][j1].second = f[k].second + search_(j - f[k].first, g) + search_(phi[k].first + search_(j - f[k].first, psi), P[i+1]);  // возможное место ошибки
+                if (P[i][j1].second > P_n[i].second) {
+                    P_n[i].second = P[i][j1].second;
                     P_n[i].first = f[k].first;
-                    P[i][k].first = f[k].first;
+                    P[i][j1].first = f[k].first;
                 }
+                
             }
 
             fprintf_s(file, "%4i | %4i | %5.3f \n", j, P_n[i].first, P_n[i].second);
+            P[i][j1].second = P_n[i].second;
+            P[i][j1].first= P_n[i].first;
         }
 
         fprintf_s(file, "\n\n");
-    }*/
+    }
 }
