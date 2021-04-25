@@ -39,14 +39,14 @@ int main() {
     bool f_f = false, f_phi = false, f_g = false, f_psi = false;
 
     vector<int> left(n), right(n);
-    left[0] = 0;
+    left[0] = 1000;
     right[0] = k1;
 
     string line1;
     string line2;
     string line;
    
-    ifstream in("C:\\Users\\kobze\\source\\repos\\LR2_EMMM\\x64\\Debug\\Вариант 9.txt");
+    ifstream in("C:\\Users\\Aria_nrod\\source\\repos\\LR2\\Debug\\Вариант 9.txt");
 
     if (in.is_open())
     {
@@ -100,7 +100,7 @@ int main() {
         right[i] = round(search_(right[i - 1], phi));
     }
 
-    FILE* file;
+    FILE* file, *file1;
     fopen_s(&file, "inverse.txt", "w");
     fprintf_s(file, "Таблицы обратного планирования\n\n");
 
@@ -142,16 +142,11 @@ int main() {
         cout << left[i] << " " << right[i] << endl;
     }*/
 
-    left[0] = 1000;
-    P[0].assign(right[0] - left[0] + 1, make_pair(0, make_pair(0, 0)));
     for (int i = n-2; i >= 0; i--) {
 
         fprintf_s(file, "%4s | %4s | %5s \n", "k", "x", "P");
         for (int j = left[i], j1 = 0; j <= right[i]; ++j, j1++) {
-            if (i == 0) {
-                cout << 1;
-            }
-            for (int k = 0; f[k].first <= j; k++) {
+            for (int k = 0; f[k].first < j; k++) {
                 P[i][j1].second.second = f[k].second + search_(j - f[k].first, g) + search__(round(psi[k].first + search_(j - f[k].first, phi)), P[i+1]);  // возможное место ошибки
                 if (P[i][j1].second.second > P_n[i].second) {
                     P_n[i].second = P[i][j1].second.second;
@@ -168,13 +163,45 @@ int main() {
         fprintf_s(file, "\n\n");
     }
 
-    /*double x = phi[0].first + search_(470 - f[0].first, psi);
-    for (int i = 0; i < P[n-2].size(); ++i) {
-        if (x == P[n-2].first) {
-            return arr[i].second;
+    fopen_s(&file1, "direct.txt", "w");
+
+    fprintf_s(file1, "%3s | %5s | %5s | %5s | %5s | %5s | %5s | %5s \n", "i", "k", "x", "y", "f", "g", "phi", "psi");
+
+    vector< vector <double> > Pr(n, vector < double> (8));
+
+    Pr[0][0] = 1;
+    Pr[0][1] = P[0][0].first;
+    Pr[0][2] = P[0][0].second.first;
+    Pr[0][3] = P[0][0].first - P[0][0].second.first;
+    Pr[0][4] = search_(P[0][0].second.first, f);
+    Pr[0][5] = search_(P[0][0].first - P[0][0].second.first, g);
+    Pr[0][6] = search_(P[0][0].first - P[0][0].second.first, phi);
+    Pr[0][7] = search_(P[0][0].second.first, psi);
+
+
+    fprintf_s(file1, "\n", Pr[0][0], Pr[0][1], Pr[0][2], Pr[0][3], Pr[0][4], Pr[0][5], Pr[0][6], Pr[0][7]);
+    for (int i = 1; i < n; i++) {
+
+        Pr[i][0] = i+1;
+        Pr[i][1] = Pr[i-1][6] + Pr[i-1][7];
+        Pr[i][2] = search__(Pr[i][1], P[i]);
+        Pr[i][3] = Pr[i][1] - Pr[i][2];
+        Pr[i][4] = search_(Pr[i][1],f);
+        Pr[i][5] = search_(Pr[i][2],g);
+        if (i == n-1) {
+            //fprintf_s(file1, "", Pr[i][0], Pr[i][1], Pr[i][2], Pr[i][3], Pr[i][4], Pr[i][5], "__", "__");
+            break;
         }
-        if (x < arr[i].first) {
-            return (arr[i - 1].second * (arr[i].first - x) + arr[i].second * (x - arr[i - 1].first)) / (arr[i].first - arr[i - 1].first);
-        }
-    }*/
+        Pr[i][6] = search_(Pr[i][2], phi);
+        Pr[i][7] = search_(Pr[i][1], psi);
+        //fprintf_s(file1, "", Pr[i][0], Pr[i][1], Pr[i][2], Pr[i][3], Pr[i][4], Pr[i][5], Pr[i][6], Pr[i][7]);
+    }
+
+    fprintf_s(file1, "\n\n\n");
+
+    double sum = 0;
+    for (int i = 0; i < n; i++) {
+        sum += Pr[i][4] + Pr[i][5];
+    }
+    fprintf_s(file1, "P_1(1000) = %i3.4", sum);
 }
