@@ -46,7 +46,7 @@ int main() {
     string line2;
     string line;
    
-    ifstream in("C:\\Users\\Aria_nrod\\source\\repos\\LR2\\Debug\\Вариант 9.txt");
+    ifstream in("C:\\Users\\kobze\\source\\repos\\LR2_EMMM\\x64\\Debug\\Вариант 9.txt");
 
     if (in.is_open())
     {
@@ -60,16 +60,16 @@ int main() {
                 f_g = false;
                 f_psi = false;
             }
-            else if(f_f && line1 != " ") {
+            else if(f_f && line1 != " " && line1 != "x") {
                 f.push_back(make_pair(atoi(line1.c_str()), atof(line2.c_str())));
             }
-            if (line1 == "x" && line2 == "g(x)") {
+            if (line1 == "x" && line2 == "g(x)" ) {
                 f_f = false;
                 f_phi = false;
                 f_g = true;
                 f_psi = false;
             }
-            else if (f_g && line1 != " ") {
+            else if (f_g && line1 != " " && line1 != "x") {
                 g.push_back(make_pair(atoi(line1.c_str()), atof(line2.c_str())));
             }
             if (line1 == "x" && line2 == "phi(x)") {
@@ -78,7 +78,7 @@ int main() {
                 f_g = false;
                 f_psi = false;
             }
-            else if (f_phi && line1 != " ") {
+            else if (f_phi && line1 != " " && line1 != "x") {
                 phi.push_back(make_pair(atoi(line1.c_str()), atof(line2.c_str())));
             }
             if (line1 == "x" && line2 == "psi(x)") {
@@ -87,7 +87,7 @@ int main() {
                 f_g = false;
                 f_psi = true;
             }
-            else if (f_psi && line1 != " ") {
+            else if (f_psi && line1 != " " && line1 != "x") {
                 psi.push_back(make_pair(atoi(line1.c_str()), atof(line2.c_str())));
             }
             line1 = " ";
@@ -113,7 +113,8 @@ int main() {
         shape[i] = right[i] - left[i] + 1;
     }
 
-    for (int i = left[n-1], i1 = 0; i <= right[n-1] && i1 < f.size(); ++i, i1++) {
+    for (int i = left[n-1], i1 = 0; i <= right[n-1]; ++i, i1++) {
+        
         for (int j = 0; f[j].first <= i; j++) {
             P[n-1][i1].second.second = f[j].second + search_(i - f[j].first, g);
             if (P[n - 1][i1].second.second > P_n[3].second) {
@@ -141,12 +142,17 @@ int main() {
         cout << left[i] << " " << right[i] << endl;
     }*/
 
-    for (int i = n-2; i >= 1; i--) {
+    left[0] = 1000;
+    P[0].assign(right[0] - left[0] + 1, make_pair(0, make_pair(0, 0)));
+    for (int i = n-2; i >= 0; i--) {
 
         fprintf_s(file, "%4s | %4s | %5s \n", "k", "x", "P");
-        for (int j = left[i], j1 = 0; j <= right[i] && j1 < f.size(); ++j, j1++) {
+        for (int j = left[i], j1 = 0; j <= right[i]; ++j, j1++) {
+            if (i == 0) {
+                cout << 1;
+            }
             for (int k = 0; f[k].first <= j; k++) {
-                P[i][j1].second.second = f[k].second + search_(j - f[k].first, g) + search__(round(phi[k].first + search_(j - f[k].first, psi)), P[i+1]);  // возможное место ошибки
+                P[i][j1].second.second = f[k].second + search_(j - f[k].first, g) + search__(round(psi[k].first + search_(j - f[k].first, phi)), P[i+1]);  // возможное место ошибки
                 if (P[i][j1].second.second > P_n[i].second) {
                     P_n[i].second = P[i][j1].second.second;
                     P_n[i].first = f[k].first;
