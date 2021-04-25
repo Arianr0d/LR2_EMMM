@@ -5,7 +5,7 @@
 using namespace std;
 
 
-double search__(int x, vector<pair< int, pair<int, double> >> arr) {   // здесь ошибка out of range
+double search__(double x, vector<pair< int, pair<int, double> >> arr) {   // здесь ошибка out of range
     
     for (int i = 0; i < arr.size(); ++i) {
         if (x == arr[i].first) {
@@ -17,13 +17,14 @@ double search__(int x, vector<pair< int, pair<int, double> >> arr) {   // здесь 
     }
 }
 
-double search_(int x, vector<pair<int, double>> arr) {
+double search_(double x, vector<pair<int, double>> arr) {
 
     for (int i = 0; i < arr.size(); ++i) {
         if (x == arr[i].first) {
             return arr[i].second;
         }
         if (x < arr[i].first) {
+
             return (arr[i - 1].second * (arr[i].first - x) + arr[i].second * (x - arr[i - 1].first)) / (arr[i].first - arr[i - 1].first);
         }
     }
@@ -96,10 +97,10 @@ int main() {
         }
     }
 
-    for (int i = 1; i < n; ++i) {
+   /* for (int i = 1; i < n; ++i) {
         left[i] = floor(search_(right[i - 1], psi));
         right[i] = round(search_(right[i - 1], phi));
-    }
+    }*/
 
     FILE* file, *file1;
     fopen_s(&file, "inverse.txt", "w");
@@ -111,7 +112,7 @@ int main() {
     vector<int> shape(n);
     for (int i = 0; i < n; i++) {
         P[i].assign(101, make_pair(0, make_pair(0,0)));
-        shape[i] = right[i] - left[i] + 1;
+        //shape[i] = right[i] - left[i] + 1;
     }
 
     /*for (int i = left[n-1], i1 = 0; i <= right[n-1]; ++i, i1++) {
