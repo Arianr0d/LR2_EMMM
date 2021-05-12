@@ -1,11 +1,12 @@
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
+#include <iomanip>
 #include <vector>
 using namespace std;
 
-// функци€ дл€ поиска и аппроксимации по k и с возвращением количества ресурсов вложенных в препри€тие
-double search__x(double k, vector<pair< int, pair<int, double> >> arr) {
+// функци€ дл€ поиска и аппроксимации по k и с возвращением количества ресурсов, вложенных в препри€тие
+double search__x(double k, vector<pair< double, pair<double, double> >> arr) {
     for (int i = 0; i < arr.size(); ++i) {
         if (k == arr[i].first) {
             return arr[i].second.first;
@@ -17,7 +18,7 @@ double search__x(double k, vector<pair< int, pair<int, double> >> arr) {
 }
 
 // функци€ дл€ поиска и аппроксимации по k и с возвращением максимальной прибыли
-double search__(double x, vector<pair< int, pair<int, double> >> arr) {
+double search__(double x, vector<pair< double, pair<double, double> >> arr) {
     
     for (int i = 0; i < arr.size(); ++i) {
         if (x == arr[i].first) {
@@ -30,7 +31,7 @@ double search__(double x, vector<pair< int, pair<int, double> >> arr) {
 }
 
  // функци€ дл€ поиска и аппроксимации по x и с возвращением максимальной прибыли
-double search_(double x, vector<pair<int, double>> arr) {
+double search_(double x, vector<pair<double, double>> arr) {
 
     for (int i = 0; i < arr.size(); ++i) {
         if (x == arr[i].first) {
@@ -48,10 +49,10 @@ int main() {
     int n = 4,             // количество мес€цев 
         k1 = 1000;         // количество имеющихс€ ресурсов в начале первого мес€ца
 
-    vector<pair<int, double>> P_n(n);
+    vector<pair<double, double>> P_n(n);
     P_n[3].second = 0;
 
-    vector<pair<int, double>> f,        // векторы дл€ хранени€ пар количества ресурсов и функции прибыли первого предпри€ти€
+    vector<pair<double, double>> f,        // векторы дл€ хранени€ пар количества ресурсов и функции прибыли первого предпри€ти€
                             phi,        // функци€ остатков ресурсов дл€ первого производства
                               g,        // функции прибыли второго предпри€ти€
                             psi;        // функци€ остатков ресурсов дл€ второго производства 
@@ -115,18 +116,18 @@ int main() {
     fopen_s(&file, "inverse.txt", "w");
     fprintf_s(file, "“аблицы обратного планировани€\n\n");
 
-    fprintf_s(file, "%4s | %4s | %5s \n", "k4", "x4", "P4");
+    fprintf_s(file, "%4s | %3s | %5s \n", "k4", "x4", "P4");
 
-    vector< vector< pair< int, pair<int, double> > > > P(n);        // таблица обратного планировани€ дл€ каждого мес€ца
+    vector< vector< pair< double, pair<double, double> > > > P(n);        // таблица обратного планировани€ дл€ каждого мес€ца
 
     for (int i = 0; i < n; i++) {
-        P[i].assign(101, make_pair(0, make_pair(0,0)));
+        P[i].assign(251, make_pair(0, make_pair(0,0)));
     }
 
     // заполнение таблицы обратного планировани€ дл€ последнего мес€ца
-    for (int i = 0, i1 = 0; i <= 1000; i += 10, i1++) {
-        for (int j = 0; j <= i; j+= 10) {
-            P[n - 1][i1].second.second = search_(j, f) + search_(i - j, g);
+    for (int i = 0, i1 = 0; i <= 1000; i += 4, i1++) {
+        for (int j = 0, j1 = 0; j <= i; j += 4, j1++) {
+            P[n - 1][i1].second.second = f[j1].second + g[i1-j1].second;
             if (P[n - 1][i1].second.second > P_n[3].second) {
                 P_n[3].second = P[n - 1][i1].second.second;
                 P_n[3].first = j;
@@ -135,11 +136,10 @@ int main() {
         P[n - 1][i1].second.second = P_n[3].second;
         P[n - 1][i1].second.first = P_n[3].first;
         P[n - 1][i1].first = i;
-        fprintf_s(file, "%4i | %4i | %5.3f\n", i, P_n[3].first, P_n[3].second);
+        fprintf_s(file, "%4i | %3i | %5.3f\n", i, (int)floor(P_n[3].first), P_n[3].second);
     }
 
     fprintf_s(file, "\n\n");
-
     P_n[2].second = 0;
     P_n[1].second = 0;
     P_n[0].second = 0;
@@ -147,10 +147,10 @@ int main() {
     // заполнение таблицы обратного планировани€ дл€ остальных мес€цев
     for (int k = n-2; k >= 0; --k) {
 
-        fprintf_s(file, "  k%i |   x%i |   P%i \n", k+1, k+1, k+1);
-        for (int i = 0, i1 = 0; i <= 1000; i += 10, i1++) {
-            for (int j = 0; j <= i; j += 10) {
-                P[k][i1].second.second = search_(j, f) + search_(i - j, g) + search__(search_(j, phi) + search_(i - j, psi), P[k + 1]);
+        fprintf_s(file, "  k%i |  x%i |   P%i \n", k+1, k+1, k+1);
+        for (int i = 0, i1 = 0; i <= 1000; i += 4, i1++) {
+            for (int j = 0, j1 = 0; j <= i; j += 4, j1++) {
+                P[k][i1].second.second = f[j1].second + g[i1-j1].second + search__(phi[j1].second + psi[i1-j1].second, P[k + 1]);
                 if (P[k][i1].second.second > P_n[k].second) {
                     P_n[k].second = P[k][i1].second.second;
                     P_n[k].first = j;
@@ -160,10 +160,10 @@ int main() {
             P[k][i1].second.first = P_n[k].first;
             P[k][i1].first = i;
             if (k == 0 && i == 1000) {
-                fprintf_s(file, "%4i | %4i | %5.3f\n", i, P_n[k].first, P_n[k].second);
+                fprintf_s(file, "%4i | %3i | %5.3f\n", i, (int)floor(P_n[k].first), P_n[k].second);
             }
             else if(k != 0) {
-                fprintf_s(file, "%4i | %4i | %5.3f\n", i, P_n[k].first, P_n[k].second);
+                fprintf_s(file, "%4i | %3i | %5.3f\n", i, (int)floor(P_n[k].first), P_n[k].second);
             }
         }
         fprintf_s(file, "\n\n");
@@ -177,16 +177,16 @@ int main() {
 
     // заполнение таблицы пр€мого планировани€
     Pr[0][0] = 1;
-    Pr[0][1] = P[0][100].first;
-    Pr[0][2] = P[0][100].second.first;
-    Pr[0][3] = P[0][100].first - P[0][100].second.first;
+    Pr[0][1] = P[0][250].first;
+    Pr[0][2] = P[0][250].second.first;
+    Pr[0][3] = P[0][250].first - P[0][250].second.first;
     Pr[0][4] = search_(Pr[0][2], f);
     Pr[0][5] = search_(Pr[0][3], g);
     Pr[0][6] = search_(Pr[0][2], phi);
     Pr[0][7] = search_(Pr[0][3], psi);
 
 
-    fprintf_s(file1, "%3.0f | %8.3f | %8.3f | %8.3f | %8.3f | %8.3f | %8.3f | %8.3f \n", Pr[0][0], Pr[0][1], Pr[0][2], Pr[0][3], Pr[0][4], Pr[0][5], Pr[0][6], Pr[0][7]);
+    fprintf_s(file1, "%3.0f | %8.3f | %8.3f | %8.3f | %8.3f | %8.3f | %8.3f | %8.4f \n", Pr[0][0], Pr[0][1], Pr[0][2], Pr[0][3], Pr[0][4], Pr[0][5], Pr[0][6], Pr[0][7]);
     for (int i = 1; i < n; i++) {
 
         Pr[i][0] = i+1;
@@ -201,7 +201,7 @@ int main() {
         }
         Pr[i][6] = search_(Pr[i][2], phi);
         Pr[i][7] = search_(Pr[i][3], psi);
-        fprintf_s(file1, "%3.0f | %8.3f | %8.3f | %8.3f | %8.3f | %8.3f | %8.3f | %8.3f \n", Pr[i][0], Pr[i][1], Pr[i][2], Pr[i][3], Pr[i][4], Pr[i][5], Pr[i][6], Pr[i][7]);
+        fprintf_s(file1, "%3.0f | %8.3f | %8.3f | %8.3f | %8.3f | %8.3f | %8.3f | %8.4f \n", Pr[i][0], Pr[i][1], Pr[i][2], Pr[i][3], Pr[i][4], Pr[i][5], Pr[i][6], Pr[i][7]);
     }
 
     fprintf_s(file1, "\n\n");
@@ -211,5 +211,5 @@ int main() {
     for (int i = 0; i < n; i++) {
         sum += Pr[i][4] + Pr[i][5];
     }
-    fprintf_s(file1, "P1(1000) = %3.4f", sum);
+    fprintf_s(file1, "P1(1000) = %3.3f", sum);
 }
